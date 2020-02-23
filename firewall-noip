@@ -1,0 +1,20 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          firewallnoip
+# Required-Start:    $network
+# Required-Stop:
+# Default-Start:
+# Default-Stop:      0 1 2 3 4 5 6
+# Short-Description: firewall rules for noip
+# Description:       Filling of the rules
+### END INIT INFO
+
+# Flush the INDYNAMIC chain
+/sbin/iptables -F INDYNAMIC
+
+# Allow incoming by domain name (e.g. using a noip)
+/sbin/iptables -A INDYNAMIC -m icmp -p icmp --icmp-type any --src CHANGE_ME.ddns.net -j ACCEPT
+/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 22 -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 80 -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 443 -j ACCEPT
+#
