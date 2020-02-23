@@ -13,8 +13,8 @@
 /sbin/iptables -F INDYNAMIC
 
 # Allow incoming by domain name (e.g. using a noip)
-/sbin/iptables -A INDYNAMIC -m icmp -p icmp --icmp-type any --src CHANGE_ME.ddns.net -j ACCEPT
-/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 22 -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m icmp -p icmp --icmp-type any --src CHANGE_ME.ddns.net -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 22 -j ACCEPT
 #/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 80 -j ACCEPT
 #/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 443 -j ACCEPT
 #
