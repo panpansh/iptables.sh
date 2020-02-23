@@ -1,0 +1,59 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          firewall
+# Required-Start:    $network
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: firewall rules
+# Description:       Filling of the rules
+### END INIT INFO
+echo "iptables rules init, please wait"
+
+# Clear the current tables
+/sbin/iptables -t filter -F
+/sbin/iptables -t filter -X
+# Creation of a dynamic tables
+/sbin/iptables -N INDYNAMIC
+/sbin/iptables -A INPUT -j INDYNAMIC
+/sbin/iptables -N OUTDYNAMIC
+/sbin/iptables -A OUTPUT -j OUTDYNAMIC
+# Start by "DROP" all requests
+/sbin/iptables -t filter -P INPUT DROP
+/sbin/iptables -t filter -P FORWARD DROP
+/sbin/iptables -t filter -P OUTPUT DROP
+# Do not break the established connections
+/sbin/iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+/sbin/iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+###### Define the legitimate flows ######
+echo "inserting legitimate flows, please wait"
+
+# Allow loopback
+/sbin/iptables -t filter -A INPUT -i lo -j ACCEPT
+/sbin/iptables -t filter -A OUTPUT -o lo -j ACCEPT
+
+# Allow outgoing
+/sbin/iptables -t filter -A OUTPUT -p icmp -j ACCEPT # ICMP ping
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 21 -j ACCEPT # FTP
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 22 -j ACCEPT # SSH
+/sbin/iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT # DNS udp
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT # DNS tcp
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT # HTTP
+/sbin/iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT # NTP
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT # HTTPS
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 465 -j ACCEPT # SMTP implicit encryption
+/sbin/iptables -t filter -A OUTPUT -p tcp --dport 587 -j ACCEPT # SMTP explicit encryption
+
+# Allow incoming
+/sbin/iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT
+# add here one line by listening service (e.g. webserver)
+#/sbin/iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+#/sbin/iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
+
+# Allow incoming by domain name (e.g. using a noip)
+/sbin/iptables -A INDYNAMIC -m icmp -p icmp --icmp-type any --src CHANGE_ME.ddns.net -j ACCEPT
+/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 22 -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 80 -j ACCEPT
+#/sbin/iptables -A INDYNAMIC -m tcp -p tcp --src CHANGE_ME.ddns.net --dport 443 -j ACCEPT
+#
